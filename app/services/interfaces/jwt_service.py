@@ -22,3 +22,12 @@ class JwtService(ABC):
     @abstractmethod
     def extract_email(self, token):
         pass
+
+    @abstractmethod
+    def verify_access_token_and_extract_username(self, token: str) -> str:
+        """
+        Verifies the access token. 
+        If expired or invalid, raises AuthenticationException (401).
+        If valid, extracts and returns the username/email.
+        """
+        pass

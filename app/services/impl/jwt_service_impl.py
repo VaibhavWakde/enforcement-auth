@@ -11,6 +11,7 @@ from app.config.jwt_config import (
 )
 
 from app.services.interfaces.jwt_service import JwtService
+from app.exceptions.custom_exception import AuthenticationException
 
 
 class JwtServiceImpl(JwtService):
@@ -74,3 +75,21 @@ class JwtServiceImpl(JwtService):
         )
 
         return payload["email"]
+
+    def verify_access_token_and_extract_username(self, token: str) -> str:
+        try:
+            payload = jwt.decode(
+                token,
+                JWT_SECRET,
+                algorithms=[JWT_ALGORITHM]
+            )
+            
+            # Ensure it is an access token
+            if payload.get("type") != "ACCESS":
+                raise AuthenticationException("Invalid token type")
+                
+            return payload["email"]
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationException("Access token has expired")
+        except jwt.PyJWTError:
+            raise AuthenticationException("Invalid access token")

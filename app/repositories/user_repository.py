@@ -15,6 +15,24 @@ class UserRepository:
             .first()
         )
 
+    def find_by_username_or_email(self, identifier: str):
+        """
+        Looks up user by email matching identifier exactly, or matching
+        the username prefix of the email.
+        """
+        if "@" in identifier:
+            return (
+                self.db.query(User)
+                .filter(User.email == identifier)
+                .first()
+            )
+        else:
+            return (
+                self.db.query(User)
+                .filter(User.email.like(f"{identifier}@%"))
+                .first()
+            )
+
     def find_by_user_id(self, user_id: str):
         return (
             self.db.query(User)

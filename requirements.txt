@@ -39,3 +39,5 @@ SQLAlchemy==2.0.43
 
 typing_extensions==4.15.0
 typing-inspection==0.4.2
+ldap3==2.9.1
+pydantic-settings==2.14.2

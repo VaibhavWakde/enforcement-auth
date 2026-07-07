@@ -4,17 +4,20 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.dependencies.repository_dependencies import (
     get_user_repository,
     get_session_repository,
+    get_login_audit_repository,
 )
 from app.dependencies.service_dependencies import (
     get_captcha_service,
     get_otp_service,
     get_email_service,
     get_jwt_service,
+    get_ldap_service,
 )
 
 from app.services.impl.auth_service_impl import AuthServiceImpl
 from app.services.interfaces.auth_service import AuthService
 from app.services.interfaces.jwt_service import JwtService
+from app.services.interfaces.ldap_service import LDAPService
 from app.repositories.user_repository import UserRepository
 from app.models.enf_user import User
 from app.exceptions.custom_exception import AuthenticationException
@@ -29,15 +32,19 @@ def get_auth_service(
     jwt_service=Depends(get_jwt_service),
     session_repository=Depends(get_session_repository),
     captcha_service=Depends(get_captcha_service),
+    ldap_service=Depends(get_ldap_service),
+    login_audit_repository=Depends(get_login_audit_repository),
 ) -> AuthService:
 
     return AuthServiceImpl(
-        user_repository,
-        otp_service,
-        email_service,
-        jwt_service,
-        session_repository,
-        captcha_service,
+        user_repository=user_repository,
+        otp_service=otp_service,
+        email_service=email_service,
+        jwt_service=jwt_service,
+        session_repository=session_repository,
+        captcha_service=captcha_service,
+        ldap_service=ldap_service,
+        login_audit_repository=login_audit_repository,
     )
 
 
@@ -49,11 +56,6 @@ def get_current_user(
     """
     FastAPI dependency that validates the Bearer token and returns the
     authenticated User ORM object.
-
-    Raises AuthenticationException (HTTP 401) if:
-    - The token is missing, malformed, or expired.
-    - The token is not an ACCESS token.
-    - The user referenced by the token no longer exists.
     """
     token = credentials.credentials
 

@@ -4,7 +4,7 @@ from app.dependencies.repository_dependencies import *
 
 from app.services.impl.captcha_service_impl import CaptchaServiceImpl
 from app.services.impl.otp_service_impl import OtpServiceImpl
-from app.services.impl.email_service_impl import EmailServiceImpl
+from app.services.impl.email_service_factory import EmailServiceFactory
 
 from app.services.interfaces.captcha_service import CaptchaService
 from app.services.interfaces.otp_service import OtpService
@@ -13,6 +13,8 @@ from app.services.interfaces.email_service import EmailService
 from app.services.impl.jwt_service_impl import JwtServiceImpl
 
 from app.services.interfaces.jwt_service import JwtService
+from app.services.interfaces.ldap_service import LDAPService
+from app.services.impl.ldap_service_impl import LDAPServiceImpl
 
 
 def get_captcha_service(
@@ -31,9 +33,13 @@ def get_otp_service(
 
 def get_email_service() -> EmailService:
 
-    return EmailServiceImpl()
+    return EmailServiceFactory.get_service()
 
 
 def get_jwt_service() -> JwtService:
 
     return JwtServiceImpl()
+
+
+def get_ldap_service() -> LDAPService:
+    return LDAPServiceImpl()
